@@ -8,23 +8,28 @@ En esta bitácora registro mi evolución técnica, las decisiones de arquitectur
 
 ## 1. Decisiones de Arquitectura y Estructura para MongoDB
 
-Para soportar el modelo de datos con Mongoose y mantener una arquitectura limpia y escalable en el servidor, he definido las siguientes carpetas dentro de `server/`:
+Para soportar el modelo de datos con Mongoose y mantener una arquitectura limpia y escalable en el servidor, he creado físicamente las siguientes carpetas dentro de `server/`:
 
-- **`server/config/`**: Contiene la configuración de servicios externos, específicamente la conexión a la base de datos (`db.js` para la lógica de conexión con Mongoose).
-- **`server/models/`**: Contiene los esquemas y modelos de datos de Mongoose (por ejemplo, `Product.model.js`, `User.model.js`), definiendo la estructura y tipos de las colecciones de MongoDB.
-- **`server/seeders/`**: Aloja los scripts de siembra de datos (_seeders_), encargados de poblar la base de datos vacía con productos de prueba y el usuario administrador inicial.
-- _Nota aclaratoria sobre `services/`:_ La lógica de conexión a la base de datos no es lógica de negocio, por lo que no va en `services/`. La carpeta `server/services/` se reservará exclusivamente para operaciones de negocio puras (como calcular totales de un carrito o procesar filtros complejos de búsqueda).
+- **`server/config/`**: Contiene la configuración de servicios externos, específicamente la conexión a la base de datos (`db.js`).
+- **`server/models/`**: Aloja los esquemas y modelos de datos de Mongoose (`Product.model.js`, `User.model.js`).
+- **`server/seeders/`**: Aloja los scripts de siembra para poblar MongoDB con productos de prueba y el usuario administrador inicial.
 
 ---
 
-## 2. Resolución del Conflicto de Producción (Compilación de CSS y Script `prestart`)
+## 2. Resolución del Conflicto de Producción (Sass en Dependencias y Script `prestart`)
 
-- **El dilema:** Si la carpeta `public/css/` está ignorada en Git y `sass` vive en `devDependencies`, ¿cómo se genera el CSS en un servidor de producción que solo hace `npm install` y `npm start`?
-- **La solución técnica:** Para solucionar esto de forma automatizada, utilizaré un script **`prestart`** en el `package.json`. Cuando ejecute `npm start`, Node.js ejecutará automáticamente primero el comando de compilación de Sass.
+- **El problema:** En entornos de producción (como servicios de despliegue), comúnmente se ejecuta `npm install` omitiendo las `devDependencies`. Si `sass` hubiera estado en `devDependencies`, el despliegue habría fallado al intentar compilar los estilos.
+- **La solución adoptada:** Moví la librería `sass` a las **`dependencies`** principales del `package.json` y creé un script **`prestart`** (`"prestart": "npm run sass:build"`). De este modo, cuando el servidor o un usuario ejecute `npm start`, Node.js ejecutará la compilación del SASS al vuelo de forma totalmente integrada y segura antes de levantar Express.
 
-  ```json
-  "scripts": {
-    "prestart": "npm run sass:build",
-    "start": "node server/index.js"
-  }
-  ```
+---
+
+## 3. Respuestas a Preguntas Técnicas Clave
+
+- **¿Por qué el punto de entrada (`main`) es `server/index.js`?**
+  Para separar la estructura del cliente (`public`, `scss`) del backend en `server/`.
+
+- **¿Dónde van las variables SASS personalizadas en relación con Bootstrap?**
+  Van **siempre antes** de importar Bootstrap, aprovechando la directiva `!default` para sobreescribir los valores por defecto del framework.
+
+- **¿Cómo se procesará la seguridad de las contraseñas?**
+  Se cifrarán mediante el uso de **`bcrypt`** generando hashes seguros en el script de siembra y comparándolos con `bcrypt.compare()` durante el endpoint de inicio de sesión del administrador.
