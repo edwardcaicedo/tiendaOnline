@@ -1,26 +1,41 @@
 # Product Backlog - TiendaOnline
 
-## Sprint 0: Configuración Base e Investigación
+## Meta del Sprint 1
 
-- [x] Configurar la estructura de archivos y carpetas del proyecto.
-- [x] Ajustar el `package.json` con scripts de compilación de Sass y arranque de servidor (`start`).
-- [x] Definir e ignorar archivos compilados y variables de entorno en `.gitignore`.
-- [ ] **Investigación de API para E-commerce:**
-  - _Objetivo:_ Definir la API o servicios backend para gestión de productos, carrito de compras y autenticación.
-  - _Opciones analizadas:_
-    1. **API REST propia (Express + Base de Datos):** Creación de endpoints `/api/products`, `/api/cart`, `/api/users` estructurados con arquitectura en capas (`controllers`, `services`, `routes`).
-    2. **FakestoreAPI / DummyJSON (para prototipado):** Consumo de APIs públicas de prueba para validar renderizado dinámico en cliente (`js/api/`) antes de integrar la base de datos definitiva.
-  - _Resultado / Decisión:_ Desarrollar una API REST nativa con Express en el directorio `server/`, usando servicios e inyección de datos para manejar productos y órdenes.
+Configurar el entorno base del proyecto, estructurar la arquitectura modular de la API REST en Express y establecer las bases visuales del e-commerce para clientes y administradores.
 
-## Sprint 1: MVP Backend & Frontend Inicial
+---
 
-- [ ] Implementar el servidor básico de Express en `server/index.js`.
-- [ ] Crear las rutas y controladores para listar productos en `server/controllers/` y `server/routes/`.
-- [ ] Diseñar el layout global responsivo con SASS y Bootstrap (`scss/layout/`, `scss/components/`).
-- [ ] Implementar la vista del catálogo de productos (`public/pages/`).
+## Sprint 1: Configuración, API Base y Estructuras
 
-## Sprint 2: Lógica de Carrito y Detalles
+### HU-01: Estructura del Servidor Base
 
-- [ ] Crear módulo cliente `js/api/` para peticiones `fetch`.
-- [ ] Desarrollar interfaz del carrito de compras y modal interactivo.
-- [ ] Configurar variables de entorno `.env` para puertos y credenciales de base de datos.
+- **Como** desarrollador backend,
+- **quiero** configurar un servidor con Express y variables de entorno
+- **para** garantizar la comunicación inicial y la seguridad de las credenciales del sistema.
+- **Prioridad:** Alta (1)
+- **Criterios de Aceptación:**
+  - El servidor arranca correctamente usando `npm start` apuntando a `server/index.js`.
+  - Se utiliza `dotenv` para leer un archivo `.env` local sin exponer datos sensibles.
+  - La estructura de carpetas incluye `controllers`, `routes`, `services` y `middlewares`.
+
+### HU-02: Gestión del Catálogo de Productos (API)
+
+- **Como** cliente de la tienda,
+- **quiero** consultar un listado de productos disponibles a través de una API REST
+- **para** poder visualizarlos en la interfaz web de la tienda.
+- **Prioridad:** Alta (2)
+- **Criterios de Aceptación:**
+  - Endpoint funcional `GET /api/products` que retorne un JSON con la lista de productos.
+  - Los productos incluyen campos estructurados: `id`, `nombre`, `precio`, `stock`, `categoria` e `imagen`.
+  - Si la base de datos o el almacenamiento local está vacío temporalmente, se pueden sembrar datos iniciales (usando datos base adaptados de fuentes como DummyJSON).
+
+### HU-03: Panel de Administración de Usuarios y Roles
+
+- **Como** administrador de la tienda,
+- **quiero** gestionar el acceso mediante roles específicos
+- **para** proteger las rutas de administración del dashboard.
+- **Prioridad:** Media (3)
+- **Criterios de Aceptación:**
+  - Existen diferenciaciones de usuario entre `cliente` y `admin`.
+  - Middleware de autenticación y control de acceso por roles implementado en el backend.

@@ -1,24 +1,31 @@
-# Bitácora del Proyecto - TiendaOnline
+# Bitácora de Aprendizaje - TiendaOnline
 
-## Registro de Actividades
+**Autor:** Edward Caicedo
 
-### Día 1: Configuración Inicial y Estructura del Proyecto
+En esta bitácora registro mi evolución técnica, las decisiones de arquitectura que tomo y las respuestas a las preguntas de profundización del proyecto.
 
-- **Fecha:** [Inserta la fecha de hoy]
-- **Actividades realizadas:**
-  - Creación de la estructura de directorios del proyecto separando el entorno de cliente (`public`, `scss`) y servidor (`server`).
-  - Inicialización del gestor de paquetes de Node.js (`package.json`).
-  - Instalación de las dependencias clave para el desarrollo:
-    - **Express** (^5.3.0) para la creación del servidor web y manejo de rutas.
-    - **Dotenv** (^18.0.10) para el manejo seguro de variables de entorno.
-    - **Sass** (^1.108.1) para la compilación de estilos avanzados.
-    - **Bootstrap** (^5.3.8) como framework de diseño responsivo.
-  - Configuración del script `sass:watch` en el `package.json` para compilar automáticamente los archivos `.scss` ubicados en `scss/main.scss` hacia el archivo compilado `public/css/styles.css`.
-  - Creación de archivos de control y configuración inicial: `.gitignore`, `.env.example`, y la documentación base (`README.md`, `backlog.md`, `bitacora.md`).
+---
 
-- **Observaciones / Decisiones técnicas:**
-  - Se optó por una arquitectura modular tanto en los estilos (metodología SASS por carpetas) como en el backend (`controllers`, `middlewares`, `routes`, `services`) para facilitar el mantenimiento y crecimiento escalable de la tienda online.
+## 1. Decisiones Técnicas y Respuestas a Preguntas Clave
 
-- **Próximos pasos:**
-  - Configurar las variables de entorno en el archivo `.env`.
-  - Levantar el servidor básico en `server/index.js`.
+- **¿Por qué el punto de entrada (`main`) cambió a `server/index.js`?**
+  Porque quise mantener una separación limpia entre la estructura del cliente (`public`, `scss`) y el backend. Al estar todo el código del servidor en la carpeta `server/`, el archivo que inicializa Express debe ser `server/index.js`.
+
+- **¿Por qué `sass` está en `devDependencies`?**
+  Porque Sass es un compilador que solo utilizo en la fase de desarrollo para transformar mis archivos `.scss` en un archivo CSS final (`public/css/styles.css`). En producción, Node.js no necesita compilar estilos; solo sirve el CSS estático ya generado.
+
+- **¿Por qué la carpeta `public/css/` se ignora en Git?**
+  Para evitar subir archivos generados automáticamente (artefactos derivados). Si los subiera, cada vez que modifique un `.scss` y lo compile se generarían conflictos molestos en Git (_merge conflicts_). Es mejor que cada entorno compile su propio CSS.
+
+- **¿Tus variables van antes o después de importar Bootstrap?**
+  Mis variables personalizadas de SASS van **siempre antes** de importar Bootstrap. Esto funciona porque Bootstrap utiliza la directiva `!default` en sus variables, lo que le permite aceptar mis valores personalizados si ya fueron declarados previamente.
+
+- **¿Cuál es la diferencia entre `server/services/` (backend) y `public/js/api/` (frontend)?**
+  - `server/services/` vive en el backend y contiene la lógica de negocio pura (por ejemplo, conectarse a MongoDB, hacer consultas con Mongoose o procesar cálculos de datos).
+  - `public/js/api/` vive en el cliente (navegador) y contiene funciones con `fetch()` encargadas exclusivamente de hacer peticiones HTTP hacia los endpoints expuestos por mi API.
+
+- **Si alguien clona tu repo y corre `npm start`, ¿qué verá y por qué?**
+  Si clonan el repositorio y ejecutan `npm start` de inmediato, el servidor Express arrancará y responderá a la API, pero la interfaz web **se verá sin estilos (sin diseño CSS)**. Esto ocurre porque la carpeta `public/css/` está ignorada en el `.gitignore` y los archivos compilados no viajan en el repositorio. Para solucionarlo, el usuario debe ejecutar primero `npm run sass:build` para generar el archivo `styles.css`.
+
+- **¿Cómo se almacenarán las contraseñas de manera segura?**
+  Las contraseñas de los usuarios nunca se guardarán en texto plano. Utilizaré la librería **`bcrypt`** para aplicar un hash con sal (_salt_) a la contraseña antes de guardarla en MongoDB, y al momento del login compararé el hash almacenado con la contraseña ingresada.
