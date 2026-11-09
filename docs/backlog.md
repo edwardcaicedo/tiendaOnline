@@ -3,61 +3,65 @@
 
 ## Meta del Sprint 1 (Demostrable)
 
-> Al finalizar este sprint, el cliente podrá visualizar en la interfaz web un catálogo inicial de productos cargados desde la base de datos MongoDB, y el administrador podrá iniciar sesión de forma segura para validar su acceso al sistema.
+> Al finalizar este sprint, el cliente podrá visualizar en la interfaz web un catálogo de productos estilizado con Bootstrap y SASS, cuyos datos provienen de una base de datos MongoDB poblada mediante un script de siembra inicial.
 
 ---
 
-## Sprint 1 (Sprint Actual)
+## Sprint 1 (Sprint Actual - MVP Catálogo y Estilos)
 
-### Tarea Técnica 01: Configuración del Servidor y Base de Datos
+### Tarea Técnica 01: Configuración de Infraestructura y Conexión a Base de Datos
 
-- **Tipo:** Tarea de Infraestructura
-- **Descripción:** Configurar el servidor base de Express, conectar la aplicación a MongoDB usando Mongoose y estructurar las variables de entorno con `dotenv`.
+- **Tipo:** Tarea Técnica
+- **Descripción:** Configurar el servidor base de Express, establecer la conexión a MongoDB mediante Mongoose (`server/config/db.js`) y estructurar las variables de entorno con `dotenv`.
 - **Criterios de Aceptación:**
-  - El servidor arranca correctamente con `npm start` en el puerto configurado.
-  - La conexión a MongoDB se establece sin errores en la consola.
+  - El servidor arranca correctamente con `npm start`.
+  - La conexión a la base de datos se reporta exitosa en consola.
 
-### HU-01: Visualización del Catálogo de Productos
+### Tarea Técnica 02: Script de Siembra (Seeder) de Datos Iniciales
+
+- **Tipo:** Tarea Técnica
+- **Descripción:** Desarrollar un script en `server/seeders/` para poblar MongoDB con datos iniciales ejecutables por comando.
+- **Criterios de Aceptación:**
+  - El seeder inserta al menos 3 productos de prueba (con campos `name`, `price`, `stock`, `image`) y un usuario administrador por defecto (con contraseña cifrada mediante `bcrypt`).
+
+### HU-01: Visualización del Catálogo con Estilos Base
 
 - **Como** cliente de la tienda,
-- **quiero** consultar un listado de productos disponibles en la interfaz web
-- **para** poder explorar los artículos que ofrece el e-commerce.
+- **quiero** consultar un listado de productos en una interfaz moderna y responsiva
+- **para** poder explorar los artículos disponibles visualmente.
 - **Prioridad:** Alta (1)
 - **Criterios de Aceptación:**
-  - Endpoint funcional `GET /api/productos` que devuelva un arreglo JSON con los productos de MongoDB.
-  - La base de datos cuenta con un script de siembra (_seeder_) que inserta al menos 3 productos de prueba con campos: `nombre`, `precio`, `stock` y `imagen`.
-  - El frontend consume el endpoint y renderiza los productos en tarjetas visuales.
+  - Endpoint funcional `GET /api/products` que devuelva los productos almacenados en MongoDB.
+  - El frontend consume el endpoint y renderiza tarjetas visuales aplicando la rejilla de diseño y componentes personalizados de Bootstrap 5 y SASS.
+
+---
+
+## Sprint 2 (Siguientes Iteraciones - Autenticación y Admin)
 
 ### HU-02: Autenticación de Administrador
 
 - **Como** administrador del sistema,
-- **quiero** iniciar sesión con mis credenciales
-- **para** obtener un token de acceso que me permita ingresar a las rutas de gestión.
-- **Prioridad:** Alta (2)
+- **quiero** iniciar sesión enviando mis credenciales en texto plano
+- **para** que el servidor valide la contraseña contra el hash almacenado y me otorgue un token de acceso (JWT).
+- **Prioridad:** Media (2)
 - **Criterios de Aceptación:**
-  - Endpoint `POST /api/auth/login` que recibe correo y contraseña cifrada con `bcrypt`.
-  - Si las credenciales son correctas, el sistema retorna un token **JWT (JSON Web Token)**.
+  - Endpoint `POST /api/auth/login` que compara la contraseña enviada con la del usuario admin en MongoDB usando `bcrypt.compare()`.
+  - Retorna un token JWT válido si las credenciales son correctas.
 
-### HU-03: Protección de Rutas por Roles
+### HU-03: Control de Acceso por Roles (Middleware)
 
 - **Como** desarrollador,
 - **quiero** implementar un middleware de autorización
-- **para** garantizar que solo los usuarios con rol de `admin` puedan acceder a las funciones del panel de control.
-- **Prioridad:** Media (3)
+- **para** proteger las rutas del panel de control permitiendo el acceso únicamente a usuarios con el rol `admin`.
+- **Prioridad:** Baja (3)
 - **Criterios de Aceptación:**
-  - El middleware valida la existencia y validez del token JWT y comprueba que `role === 'admin'`.
+  - El middleware intercepta solicitudes, verifica el token JWT y valida que `role === 'admin'`.
 
 ---
 
-## Product Backlog (Historias Futuras)
+## Product Backlog (Futuro)
 
-### Historias de Cliente (E-commerce)
-
-- **HU-04:** Como cliente, quiero hacer clic en un producto para ver su detalle completo y descripción.
-- **HU-05:** Como cliente, quiero agregar y eliminar productos de mi carrito de compras para simular un proceso de compra.
-
-### Historias de Administrador (Dashboard)
-
-- **HU-06:** Como administrador, quiero registrar nuevos productos o modificar el stock existente desde el panel de control.
-- **HU-07:** Como administrador, quiero consultar el listado de pedidos o ventas registradas en la tienda.
+- **HU-04:** Como cliente, quiero ver el detalle de un producto al seleccionarlo.
+- **HU-05:** Como cliente, quiero agregar productos a un carrito de compras.
+- **HU-06:** Como administrador, quiero registrar o modificar productos desde el dashboard.
 ```
